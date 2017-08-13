@@ -2,7 +2,9 @@ Flask==0.10.1
 SQLAlchemy==1.1.10
 WTForms==2.1
 gunicorn==19.7.1
-numpy>=1.6.2
+numpy>=1.8.2
 pandas>=0.8.1
 psycopg2>=2.5.1
 json2table==1.1.5
+scipy>=0.13.3
+sklearn==0.18
