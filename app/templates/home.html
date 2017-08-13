@@ -238,7 +238,7 @@ body a {
         }).then(function(data) {
           // gets the id for the files
           data.json().then(function(response) {
-            document.getElementById("js-download").href = "http://0.0.0.0:5000/download/" + response.hashid;
+            document.getElementById("js-download").href = "https://ml4all1.herokuapp.com/download/" + response.hashid;
             var performance = document.createElement('div');
             performance.innerHTML = response.performance;
 
@@ -345,7 +345,7 @@ body a {
               </div>
               <h3></h3>
               <h4>Download prediction output</h4>
-              <a href="http://0.0.0.0:5000/download" id="js-download" style="display:inline;">
+              <a href="https://ml4all1.herokuapp.com/download" id="js-download" style="display:inline;">
                 <button type="download" class="btn btn-sm btn-primary" >Ready for download!</button>
               </a>
 							<img src="/static/step4.png" alt="step4" style="width:50px;height:25px;">
