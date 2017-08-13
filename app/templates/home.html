@@ -255,7 +255,7 @@ body a {
           //Show output buttons only when model is done running
           document.getElementById('Section3').style.display = "inline";
         })
-        .catch(function(error)){alert("there is an error",error);}
+        .catch(function(error){alert("there is an error",error);});
 				//Remove old iframe if it is there
 				var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
 				if(currentIframes.length >= 1){
