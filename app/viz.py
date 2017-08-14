@@ -156,7 +156,8 @@ def check_shiny():
 	import time
 	while response_code != 200:
 		try:
-			r = requests.head("http://127.0.0.1:2326")
+			#r = requests.head("http://127.0.0.1:2326")
+            r = requests.head("http://ml4all1.herokuapp.com:2326")
 			response_code = r.status_code
 			print(r.status_code)
 		except requests.ConnectionError:
