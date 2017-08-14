@@ -77,7 +77,7 @@
   padding-left: 50px;
   padding-right: 50px;
   padding-top: 35px;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 #Section2 {
@@ -86,7 +86,7 @@
   padding-left: 50px;
   padding-right: 50px;
   padding-top: 15px;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 #Section3 {
@@ -95,14 +95,14 @@
   padding-left: 50px;
   padding-right: 50px;
   padding-top: 15px;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 iframe
 {
   border: none;
   width: 100%;
-  height: 550px
+  height: 600px
 }
 
 
@@ -133,10 +133,10 @@ body a {
 <body>
 
   <div id="NavBar">
-    <a href="http://localhost:5000/method" target="_blank">Tutorial and Methods</a>
+    <a href="https://ml4all1.herokuapp.com/method" target="_blank">Tutorial and Methods</a>
     <div id="NavRight">
       <a href="#Section1">App</a>
-      <a href="#Section2">Visualizations</a>
+      <a href="#Section2">Visualization</a>
     </div>
   </div>
 
@@ -150,29 +150,47 @@ body a {
 
   <div class="container", id="input_window">
       <div class="panel panel-default">
+        <div class="panel-heading"><strong>Upload Files</strong></div>
         <div class="panel-body">
 
           <!-- Standard Form -->
           <h4>Select files from your computer</h4>
           <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
             <div class="form-inline">
-              <h5>Training data</h5>
+              <h5>Training data <img src="/static/step1.png" alt="step1" style="width:50px;height:25px;"></h5>
               <div class="form-group">
-                <input type="file" name="train" id="js-train-files" required>
+                <input type="file" name="train" id="js-train-files" multiple>
               </div>
 
-              <h5>Testing data</h5>
+              <h5>Testing data <img src="/static/step2.png" alt="step2" style="width:50px;height:25px;"></h5>
               <div class="form-group">
-                <input type="file" name="test" id="js-test-files" required>
+                <input type="file" name="test" id="js-test-files" multiple>
               </div>
 
               <button type="submit" class="btn btn-md btn-primary" id="js-upload-submit">Upload files</button>
+							<img src="/static/step3.png" alt="step3" style="width:50px;height:25px;">
             </div>
           </form>
 
         </div>
       </div>
     </div> <!-- /container -->
+
+    <!-- <div class="container" id="output">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Prediction Output</strong></div>
+          <div class="panel-body">
+            <h4>Prediction accuracy</h4>
+            <div id="js-performance">
+            </div>
+            <h5></h5>
+            <h4>Download prediction output</h4>
+            <a href="http://0.0.0.0:5000/download" id="js-download" style="display:none;">
+              <button type="download" class="btn btn-sm btn-primary" >Ready for download!</button>
+            </a>
+          </div>
+        </div>
+    </div> -->
 
   <script>
 
@@ -184,16 +202,28 @@ body a {
 
     var dropZone = document.getElementById('drop-zone');
     var uploadForm = document.getElementById('js-upload-form');
-		var hash_train = "train";
-		var hash_test = "test";
+
+		function ifServerOnline(ifOnline, ifOffline){
+    var img = document.body.appendChild(document.createElement("img"));
+    img.onload = function()
+    {
+        ifOnline && ifOnline.constructor == Function && ifOnline();
+    };
+    img.onerror = function()
+    {
+        ifOffline && ifOffline.constructor == Function && ifOffline();
+    };
+    img.src = "http://127.0.0.1:2326";
+		}
 
     var startUpload = function(train, test) {
         // Jacky read this: http://blog.teamtreehouse.com/uploading-files-ajax
-        console.log(train, test);
+        // console.log(train, test);
         var formData = new FormData();
         for (var i = 0; i < train.length; i++) {
           var file = train[i];
           formData.append("train", file, file.name);
+
         }
 
         for (var i = 0; i < test.length; i++) {
@@ -207,94 +237,83 @@ body a {
           method: 'POST',
           body: formData
         }).then(function(data) {
-          data.json().then(function(hashval) {
+          // gets the id for the files
+          data.json().then(function(response) {
+            document.getElementById("js-download").href = "https://ml4all1.herokuapp.com/download/" + response.hashid;
+            var performance = document.createElement('div');
+            performance.innerHTML = response.performance;
 
-						//Remove old iframe if it is there
-						var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
-						if(currentIframes.length >= 1){
-								currentIframes[0].remove();
-						}
-
-						// Remove old performance html if it is there
+						//Remove old performance html if it is there
 						var currentPerformance = document.getElementById("js-performance").getElementsByTagName("div");
+						console.log(currentPerformance.length)
 						if(currentPerformance.length >= 1){
 								currentPerformance[0].remove();
 						}
 
-						// Hide output panel
-						document.getElementById('Section3').style.display = "none";
-						// Display iframe with Shiny app
-						fetch('/shiny', {
-							method: 'GET'
-						}).then(function(showShiny) {
-							var iframe = document.createElement('iframe');
-							iframe.style.display = "inline";
-							iframe.src = "http://127.0.0.1:2326";
-							//Append new iframe
-							document.getElementById('Section2').style.display = "block";
-							document.getElementById("Section2").appendChild(iframe);
-						})
+            document.getElementById("js-performance").appendChild(performance);
+          });
+          //Show output buttons only when model is done running
+          document.getElementById('Section3').style.display = "inline";
+        })
+        .catch(function(error){alert("there is an error",error);});
+				//Remove old iframe if it is there
+				var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
+				if(currentIframes.length >= 1){
+						currentIframes[0].remove();
+				}
 
-						// Run prediction
-						fetch('/predict/' + hashval.hash_train + '_' +  hashval.hash_test, {
-							method: 'GET'
-		        }).then(function(data) {
-		          data.json().then(function(response) {
-		            document.getElementById("js-download").href = "http://0.0.0.0:5000/download/" + response.hashid;
-		            var performance = document.createElement('div');
-		            performance.innerHTML = response.performance;
+        // Display iframe with Shiny app
+        setTimeout(function () {
+          var iframe = document.createElement('iframe');
+          iframe.style.display = "inline";
+          iframe.src = "http://127.0.0.1:2326";
+          //Append new iframe
+          document.getElementById("Section2").appendChild(iframe);
+        }, 2000);
 
-		            document.getElementById("js-performance").appendChild(performance);
-		          });
-		          //Show output buttons only when model is done running
-		          document.getElementById('Section3').style.display = "block";
-		        })
+				// ifServerOnline(function()
+				// {
+				// 	var iframe = document.createElement('iframe');
+				// 	iframe.style.display = "inline";
+				// 	iframe.src = "http://127.0.0.1:2326";
+				// 	//Remove old iframe if it is there
+				// 	var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
+				// 	if(currentIframes.length >= 1){
+				// 			currentIframes[0].remove();
+				// 	}
+				// 	//Append new iframe
+				// 	document.getElementById("Section2").appendChild(iframe);
+				// },
+				// function ()
+				// {
+				// 		setTimeout(function () {
+				// 			ifServerOnline()
+				// 		}, 200);
+				// });
 
-
-        	})
-				})
-
-				// //Remove old iframe if it is there
-				// var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
-				// if(currentIframes.length >= 1){
-				// 		currentIframes[0].remove();
+				// var url = "http://127.0.0.1:2326";
+				// var img = new Image();
+				// img.src = url;
+				//
+				//
+				// img.onload = function()
+				// {
+				//   var iframe = document.createElement('iframe');
+				//   iframe.style.display = "inline";
+				//   iframe.src = "http://127.0.0.1:2326";
+				//   //Remove old iframe if it is there
+				//   var currentIframes = document.getElementById("Section2").getElementsByTagName("iframe");
+				//   if(currentIframes.length >= 1){
+				//       currentIframes[0].remove();
+				//   }
+				//   //Append new iframe
+				//   document.getElementById("Section2").appendChild(iframe);
 				// }
 				//
-				// // Display iframe with Shiny app
-				// fetch('/shiny', {
-				// 	method: 'GET'
-        // }).then(function(showShiny) {
-				// 	var iframe = document.createElement('iframe');
-        //   iframe.style.display = "inline";
-        //   iframe.src = "http://127.0.0.1:2326";
-        //   //Append new iframe
-				// 	document.getElementById('Section2').style.display = "block";
-        //   document.getElementById("Section2").appendChild(iframe);
-        // })
-
-				// // Run prediction
-				// fetch('/prediction', {
-				// 	method: 'GET'
-        // }).then(function(data) {
-        //   // gets the id for the files
-        //   data.json().then(function(response) {
-        //     document.getElementById("js-download").href = "http://0.0.0.0:5000/download/" + response.hashid;
-        //     var performance = document.createElement('div');
-        //     performance.innerHTML = response.performance;
-				//
-				// 		//Remove old performance html if it is there
-				// 		var currentPerformance = document.getElementById("js-performance").getElementsByTagName("div");
-				// 		console.log(currentPerformance.length)
-				// 		if(currentPerformance.length >= 1){
-				// 				currentPerformance[0].remove();
-				// 		}
-				//
-        //     document.getElementById("js-performance").appendChild(performance);
-        //   });
-        //   //Show output buttons only when model is done running
-        //   document.getElementById('Section3').style.display = "block";
-        // })
-
+				// img.onerror = function()
+				// {
+				// 	console.log("Off")
+				// }
     }
 
 
@@ -310,7 +329,7 @@ body a {
   </script>
   </div>
 
-  <div id="Section2" style="display:none;">
+  <div id="Section2">
     <p class="heading">Visualizations</p>
     <p>
     </p>
@@ -320,13 +339,17 @@ body a {
     <p class="heading">Results</p>
       <div class="container" id="output">
           <div class="panel panel-default">
+            <div class="panel-heading"><strong>Prediction Output</strong></div>
             <div class="panel-body">
+              <h4>Prediction accuracy</h4>
               <div id="js-performance">
               </div>
-              <h2></h2>
-              <a href="http://0.0.0.0:5000/download" id="js-download" style="display:inline;">
-                <button type="download" class="btn btn-md btn-primary" >Download predictions!</button>
+              <h3></h3>
+              <h4>Download prediction output</h4>
+              <a href="https://ml4all1.herokuapp.com/download" id="js-download" style="display:inline;">
+                <button type="download" class="btn btn-sm btn-primary" >Ready for download!</button>
               </a>
+							<img src="/static/step4.png" alt="step4" style="width:50px;height:25px;">
             </div>
           </div>
       </div>

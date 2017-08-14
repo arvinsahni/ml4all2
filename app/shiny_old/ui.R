@@ -1,7 +1,7 @@
 library(markdown)
 
-navbarPage("",
-           tabPanel("Uploaded data",
+navbarPage("EDA",
+           tabPanel("Inspect data",
                     fluidPage(
                       fluidRow(
                         column(2,
@@ -28,24 +28,27 @@ navbarPage("",
                     )
            ),
            
-           tabPanel("Data distribution",
+           tabPanel("Data summary",
                     fluidPage(
                       fluidRow(
                         column(2,
-                          radioButtons('show_vars', 'Choose column in dataset to summarize:',
-                                             names(df_train[,target.vars])[-1], selected = names(df_train[,target.vars])[-1][1]),
+                          radioButtons('show_vars', 'Variable in dataset to plot:',
+                                             names(df_train)[-1], selected = names(df_train)[-1][1]),
                           br()
                         ),
                         
-                        column(10, align="center",
-                          h3(textOutput("summary.label")),
+                        column(10,
                           fluidRow(
-                            column(8,
-                              plotlyOutput("summary.plot.train")
+                            column(5,
+                              h4("Training data:"),
+                              plotlyOutput("summary.plot.train"),
+                              tableOutput("summary.table.train")
                             ),
                             
-                            column(2,
-                              tableOutput("summary.table.train")
+                            column(5,
+                              h4("Testing data:"),
+                              plotlyOutput("summary.plot.test"),
+                              tableOutput("summary.table.test")
                             )
                           )
                         )
@@ -53,12 +56,19 @@ navbarPage("",
                     )
            ),
            
-           tabPanel("Relationship with predictions",
+           tabPanel("Missing data",
+                    splitLayout(
+                        plotOutput("miss.plot"),
+                        tableOutput("miss.table")
+                    )
+           ),
+           
+           tabPanel("Versus response variable",
                     fluidPage(
                       fluidRow(
                         column(2,
-                          radioButtons('show_vars2', 'Choose column in dataset to plot against column you are trying to predict:',
-                                       names(df_train[,target.vars])[-1], selected = names(df_train[,target.vars])[-1][1]),
+                          radioButtons('show_vars2', 'Variable in dataset to plot against outcome var:',
+                                       target.vars, selected = target.vars[1]),
                           br()
                         ),
                         
@@ -66,6 +76,23 @@ navbarPage("",
                           plotlyOutput("relation.plot")
                         )
                       )  
+                    )
+           ),
+           
+           
+           tabPanel("Correlations vs. outcome",
+                    sidebarLayout(
+                      
+                      sidebarPanel(
+                        radioButtons("sort1", "Sort by:",
+                                     c("Absolute value" = "abs",
+                                       "Nominal value" = "corr")),
+                        br()
+                      ),
+                      
+                      mainPanel(
+                        plotOutput("corr.plot.outcome")
+                      )
                     )
            )
            

@@ -14,6 +14,7 @@ import hashlib
 import datetime
 from datetime import date
 import numpy as np
+import os
 from subprocess import Popen
 import shlex
 import sys
@@ -42,13 +43,13 @@ p="global variable for the vis server"
 def index():
 	return render_template('home.html')
 
-@app.route('/')
-def dataset():
-   return render_template('home.html')
-
 @app.route('/method')
 def method():
 	return render_template('method.html')
+
+@app.route('/viz')
+def viz():
+	return render_template('viz.html')
 
 
 def to_csv(d, fields):
@@ -57,6 +58,10 @@ def to_csv(d, fields):
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/')
+def dataset():
+   return render_template('home.html')
 
 @app.route('/dataset',methods=['POST'])
 def upload_file():
@@ -89,6 +94,7 @@ def upload_file():
 		# submit a empty part without filename
 		if file.filename == '':
 
+			print("hiiio")
 			print(request.url)
 			error='Kindly upload both training and testing files'
 
@@ -141,79 +147,54 @@ def upload_file():
 			temp_hash=pd.util.hash_pandas_object(df_test)
 			hash_test = hashlib.sha256(str(temp_hash).encode('utf-8','ignore')).hexdigest()
 
-			# Save test data in /uploads folder
+			#Save test data in /uploads folder
 			os.system("mv app/uploads/" + filename + " " + "app/uploads/" + hash_test + ".csv")
 
-		# Pass datasets to Shiny app
+			## update dict ---> key:hash ,value: dataframe
+
+		#Pass datasets to Shiny app
 		p = Popen(shlex.split("Rscript app/shiny/shiny.R " + hash_train + ".csv " + hash_test + ".csv"))
-		return(jsonify({"hash_train": hash_train, "hash_test": hash_test}))
 
+		#Make predictions
+		X, y = utils.X_y_split(X_train=df_train, X_test=df_test)
+		model = fa.All()
+		model.fit(X, y)
 
-@app.route('/shiny',methods=['GET'])
-def check_shiny():
-	# Check if Shiny server is up
-	response_code = 0
-	import time
-	while response_code != 200:
-		try:
-			r = requests.head("http://127.0.0.1:2326")
-			response_code = r.status_code
-			print(r.status_code)
-		except requests.ConnectionError:
-			time.sleep(0.1)
-			print("Trying to connect to Shiny server.")
-			pass
+		# Append prediction column to test set
+		predictions = model.predict(df_test)
+		df_test['prediction'] = predictions
+		# Save output file in /downloads folder
+		df_test.to_csv("app/downloads/" + hash_train + "_" + hash_test + ".csv", index=False)
 
-	return("Shiny server is up.")
+		# Add model.display_score to JSON and round values
+		model.all_metrics = {k:round(v, 3) for k, v in model.all_metrics.items()}
+		model.all_metrics['Overall score']=model.display_score
 
+		# Build HTML table
+		build_direction = "LEFT_TO_RIGHT"
+		table_attributes = {"style" : "width:30%"}
+		display_score = convert(model.all_metrics, build_direction=build_direction, table_attributes=table_attributes)
 
-@app.route('/predict/<hash_train>_<hash_test>', methods=['GET'])
-def run_prediction(hash_train, hash_test):
-	train_file=hash_train + ".csv"
-	test_file=hash_test + ".csv"
-
-	# Make predictions
-	df_train=pd.read_csv(os.path.join('app/','uploads/', train_file))
-	df_test=pd.read_csv(os.path.join('app/','uploads/', test_file))
-	X, y = utils.X_y_split(X_train=df_train, X_test=df_test)
-	model = fa.All()
-	model.fit(X, y)
-
-	# Append prediction column to test set
-	predictions = model.predict(df_test)
-	df_test['prediction'] = predictions
-	# Save output file in /downloads folder
-	df_test.to_csv("app/downloads/" + hash_train + "_" + hash_test + ".csv", index=False)
-
-	# Add model.display_score to JSON and round values
-	model.all_metrics = {k:round(v, 3) for k, v in model.all_metrics.items()}
-	model.all_metrics['Overall score']=model.display_score
-
-	# Build HTML table
-	build_direction = "LEFT_TO_RIGHT"
-	table_attributes = {"style" : "width:30%"}
-	display_score = convert(model.all_metrics, build_direction=build_direction, table_attributes=table_attributes)
-
-	# if df_train.shape[1]==(df_test.shape[1]-1):
-	# 	temp=hash_test
-	# 	hash_test=hash_train
-	# 	hash_train=temp
-	# 	temp_df=df_test
-	# 	df_test=df_train
-	# 	df_train=temp_df
-	#
-	# TESTING_DATA[hash_test]=df_test
-	# TRAINING_DATA[hash_train]=df_train
-	# #print("hash_train2",hash_train)
-	# #print("hash_test2",hash_test)
-	# #print("df_train2",df_train)
-	# #print("df_test2",df_test)
-	# flash("Uploaded files all training")
-	# return redirect('home.html')
-	# return jsonify({"hash":hash})
-	# return redirect(request.url)
-	# return redirect(url_for('dataset'))
-	return(jsonify({"hashid": hash_train + "_" + hash_test, "performance": display_score}))
+		# if df_train.shape[1]==(df_test.shape[1]-1):
+		# 	temp=hash_test
+		# 	hash_test=hash_train
+		# 	hash_train=temp
+		# 	temp_df=df_test
+		# 	df_test=df_train
+		# 	df_train=temp_df
+		#
+		# TESTING_DATA[hash_test]=df_test
+		# TRAINING_DATA[hash_train]=df_train
+		# #print("hash_train2",hash_train)
+		# #print("hash_test2",hash_test)
+		# #print("df_train2",df_train)
+		# #print("df_test2",df_test)
+		# flash("Uploaded files all training")
+		#return redirect('home.html')
+		#return jsonify({"hash":hash})
+		#return redirect(request.url)
+		# return redirect(url_for('dataset'))
+		return(jsonify({"hashid": hash_train + "_" + hash_test, "performance": display_score}))
 
 ## may look to add another app.route for test data hash but later
 

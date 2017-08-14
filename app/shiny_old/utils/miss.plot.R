@@ -11,10 +11,6 @@ miss.plot<-function(data, only.missing=TRUE, plot.color="coral1"){
     miss_pct<-miss_pct[miss_pct > 0]
   }
   
-  if(miss_pct==0){
-    return("No missing values in dataset.")
-  }
-  
   missing.df<-data.frame(pct.missing=miss_pct, var=names(miss_pct), row.names=NULL)
   
   

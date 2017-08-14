@@ -9,6 +9,8 @@ args<-commandArgs(TRUE)
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
 #Source custom plotting functions
+source("app/shiny/utils/miss.plot.R")
+source("app/shiny/utils/corr.plot.R")
 source("app/shiny/utils/data.type.R")
 
 #Load datasets from input args
@@ -34,7 +36,9 @@ type<-sapply(df_train, data.type)
 df_type<-data.frame(type)
 df_type$var<-row.names(df_type)
 row.names(df_type)<-NULL
-print(df_type)
 target.vars<-df_type$var[df_type$type %in% target.type]
+target.vars<-target.vars[-1]
+
+
 
 shiny::runApp(appDir="app/shiny/", port = 2326)
