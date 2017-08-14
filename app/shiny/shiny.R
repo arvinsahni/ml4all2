@@ -39,9 +39,9 @@ target.vars<-df_type$var[df_type$type %in% target.type]
 
 port <- Sys.getenv('PORT')
 
-shiny::runApp(
-  appDir = getwd(),
-  host = '0.0.0.0',
-  port = as.numeric(port)
-)
-#shiny::runApp(appDir="app/shiny/", port = 2326)
+#shiny::runApp(
+  #appDir = getwd(),
+  #host = '0.0.0.0',
+  #port = as.numeric(port)
+#)
+shiny::runApp(appDir="app/shiny/", port = 2326)
