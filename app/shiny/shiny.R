@@ -37,4 +37,11 @@ row.names(df_type)<-NULL
 print(df_type)
 target.vars<-df_type$var[df_type$type %in% target.type]
 
-shiny::runApp(appDir="app/shiny/", port = 2326)
+port <- Sys.getenv('PORT')
+
+shiny::runApp(
+  appDir = getwd(),
+  host = '0.0.0.0',
+  port = as.numeric(port)
+)
+#shiny::runApp(appDir="app/shiny/", port = 2326)
