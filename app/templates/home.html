@@ -133,7 +133,7 @@ body a {
 <body>
 
   <div id="NavBar">
-    <a href="http://localhost:5000/method" target="_blank">Tutorial and Methods</a>
+    <a href="http://ml4all1.herokuapp.com/method" target="_blank">Tutorial and Methods</a>
     <div id="NavRight">
       <a href="#Section1">App</a>
       <a href="#Section2">Visualizations</a>
@@ -240,7 +240,7 @@ body a {
 							method: 'GET'
 		        }).then(function(data) {
 		          data.json().then(function(response) {
-		            document.getElementById("js-download").href = "http://0.0.0.0:5000/download/" + response.hashid;
+		            document.getElementById("js-download").href = "http://ml4all1.herokuapp.com/download/" + response.hashid;
 		            var performance = document.createElement('div');
 		            performance.innerHTML = response.performance;
 
@@ -324,7 +324,7 @@ body a {
               <div id="js-performance">
               </div>
               <h2></h2>
-              <a href="http://0.0.0.0:5000/download" id="js-download" style="display:inline;">
+              <a href="http://ml4all1.herokuapp.com/download" id="js-download" style="display:inline;">
                 <button type="download" class="btn btn-md btn-primary" >Download predictions!</button>
               </a>
             </div>
