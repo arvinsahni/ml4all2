@@ -9,4 +9,3 @@ json2table==1.1.5
 scipy>=0.13.3
 sklearn>=0.0
 requests>=2.18
-site>=0.0.1
