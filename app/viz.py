@@ -154,9 +154,10 @@ def check_shiny():
 	# Check if Shiny server is up
 	response_code = 0
 	import time
+    port1 = os.environ["PORT"]
 	while response_code != 200:
 		try:
-			r = requests.head("https://ml4all1.herokuapp.com:2326")
+			r = requests.head("https://ml4all1.herokuapp.com:"+str(port1))
 			response_code = r.status_code
 			print(r.status_code)
 		except requests.ConnectionError:
