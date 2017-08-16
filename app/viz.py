@@ -65,12 +65,12 @@ def upload_file():
 	test_file_name ='test'
 	error=None
 	if request.method == 'POST':
-		try:
-			p.terminate()
-			print("Shiny server killed.")
-		except Exception as e:
-			print(e)
-			print("Did not find a Shiny server to kill...")
+		#try:
+			#p.terminate()
+			#print("Shiny server killed.")
+		#except Exception as e:
+			#print(e)
+			#print("Did not find a Shiny server to kill...")
 
 		# check if the post request has the file part
 		if train_file_name not in request.files or test_file_name not in request.files:
