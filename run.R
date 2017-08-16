@@ -1,6 +1,7 @@
 library(shiny)
 
-port <- Sys.getenv('PORT')
+#port <- Sys.getenv('PORT')
+options(shiny.port = 7775)
 
 cat("hello cat")
 cat(port)
