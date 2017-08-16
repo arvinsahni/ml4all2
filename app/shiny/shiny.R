@@ -44,4 +44,5 @@ port1 <- Sys.getenv('PORT')
   #host = '0.0.0.0',
   #port = as.numeric(port)
 #)
+cat("in shiny.R")
 shiny::runApp(appDir="app/shiny/", port = port1)

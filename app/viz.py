@@ -155,6 +155,7 @@ def check_shiny():
 	response_code = 0
 	import time
 	port1 = os.environ["PORT"]
+	print("port1 is ",port1)
 	while response_code != 200:
 		try:
 			r = requests.head("https://ml4all1.herokuapp.com:"+str(port1))
