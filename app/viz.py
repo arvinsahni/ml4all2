@@ -158,7 +158,8 @@ def check_shiny():
 	print("port1 is ",port1)
 	while response_code != 200:
 		try:
-			r = requests.head("https://ml4all1.herokuapp.com:"+str(port1))
+			#r = requests.head("https://ml4all1.herokuapp.com:"+str(port1))
+            r=requests.head("http://0.0.0.0:7775")
 			response_code = r.status_code
 			print(r.status_code)
 		except requests.ConnectionError:
