@@ -1,2 +1,5 @@
 install.packages("shiny")
 install.packages("dplyr")
+install.packages("DT")
+install.packages("stargazer")
+install.packages("plotly")
