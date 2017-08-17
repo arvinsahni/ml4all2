@@ -8,6 +8,6 @@ cat(port2)
 cat("done")
 shiny::runApp(
   appDir = getwd(),
-  host = '0.0.0.0',
+  host = '127.0.0.0',
   port = as.numeric(port2)
 )

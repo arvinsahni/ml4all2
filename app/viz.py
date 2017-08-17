@@ -65,12 +65,12 @@ def upload_file():
 	test_file_name ='test'
 	error=None
 	if request.method == 'POST':
-		#try:
-			#p.terminate()
-			#print("Shiny server killed.")
-		#except Exception as e:
-			#print(e)
-			#print("Did not find a Shiny server to kill...")
+		try:
+			p.terminate()
+			print("Shiny server killed.")
+		except Exception as e:
+			print(e)
+			print("Did not find a Shiny server to kill...")
 
 		# check if the post request has the file part
 		if train_file_name not in request.files or test_file_name not in request.files:
@@ -159,7 +159,7 @@ def check_shiny():
 	while response_code != 200:
 		try:
 			#r = requests.head("https://ml4all1.herokuapp.com:"+str(port1))
-			r=requests.head("http://0.0.0.0:7775")
+			r=requests.head("http://127.0.0.0:7775")
 			response_code = r.status_code
 			print(r.status_code)
 		except requests.ConnectionError:
