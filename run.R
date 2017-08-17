@@ -11,8 +11,8 @@ cat("done")
   #host = '0.0.0.0',
   #port = as.numeric(port2)
 #)
-shiny::runApp(
-  appDir = 'app/',
-  host = '0.0.0.0',
-  port = as.numeric(port2)
-)
+#shiny::runApp(
+  #appDir = 'app/',
+  #host = '0.0.0.0',
+  #port = as.numeric(port2)
+#)
