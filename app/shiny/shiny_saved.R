@@ -2,6 +2,7 @@
 library(shiny)
 library(dplyr)
 library(DT)
+library(stargazer)
 library(plotly)
 
 args<-commandArgs(TRUE)
