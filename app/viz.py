@@ -145,8 +145,9 @@ def upload_file():
 			os.system("mv app/uploads/" + filename + " " + "app/uploads/" + hash_test + ".csv")
 
 		# Pass datasets to Shiny app
-		p = Popen(shlex.split("Rscript ~/shiny.R " + hash_train + ".csv " + hash_test + ".csv",posix=False))
-		return(jsonify({"hash_train": hash_train, "hash_test": hash_test}))
+		#p = Popen(shlex.split("Rscript ~/shiny.R " + hash_train + ".csv " + hash_test + ".csv",posix=False))
+        p = Popen(["Rscript /app/shiny.R " , hash_train + ".csv " , hash_test + ".csv"],shell=True)
+        return(jsonify({"hash_train": hash_train, "hash_test": hash_test}))
 
 
 @app.route('/shiny',methods=['GET'])
