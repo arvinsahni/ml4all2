@@ -122,8 +122,8 @@ def upload_file():
 		## For the test file
 		file = request.files[test_file_name]
 
-			# if user does not select file, browser also
-			# submit a empty part without filename
+		# if user does not select file, browser also
+		# submit a empty part without filename
 		if file.filename == '':
 			print(request_url)
 			flash('No selected files')
@@ -147,8 +147,8 @@ def upload_file():
 
 		# Pass datasets to Shiny app
 		#p = Popen(shlex.split("Rscript ~/shiny.R " + hash_train + ".csv " + hash_test + ".csv",posix=False))
-        	p = Popen(["Rscript /app/shiny.R " , str(hash_train) + ".csv " , str(hash_test) + ".csv"])
-        	return(jsonify({"hash_train": hash_train, "hash_test": hash_test}))
+		p = Popen(["Rscript /app/shiny.R " , str(hash_train) + ".csv " , str(hash_test) + ".csv"])
+		return(jsonify({"hash_train": hash_train, "hash_test": hash_test}))
 
 
 @app.route('/shiny',methods=['GET'])
